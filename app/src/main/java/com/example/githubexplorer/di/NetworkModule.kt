@@ -2,8 +2,6 @@ package com.example.githubexplorer.di
 
 import com.example.githubexplorer.BuildConfig
 import com.example.githubexplorer.data.remote.api.SearchApi
-import com.example.githubexplorer.data.remote.repository.SearchUsersRepositoryImpl
-import com.example.githubexplorer.domain.repository.SearchUsersRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object NetworkModule {
 
     @Provides
     fun provideLoggingInterceptor(): HttpLoggingInterceptor {
@@ -47,10 +45,5 @@ object AppModule {
     @Provides
     fun provideSearchApi(retrofit: Retrofit): SearchApi {
         return retrofit.create(SearchApi::class.java)
-    }
-
-    @Provides
-    fun provideSearchUsersRepository(apiService: SearchApi): SearchUsersRepository {
-        return SearchUsersRepositoryImpl(apiService)
     }
 }
