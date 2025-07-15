@@ -4,7 +4,7 @@ data class UserEntity(
     val login: String,
     val id: Long,
     val nodeId: String,
-    val avatarUrl: String,
+    val icon: String,
     val gravatarId: String?,
     val url: String,
     val htmlUrl: String,

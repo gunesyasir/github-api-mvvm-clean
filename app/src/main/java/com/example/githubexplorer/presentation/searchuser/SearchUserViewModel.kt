@@ -3,6 +3,7 @@ package com.example.githubexplorer.presentation.searchuser
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.githubexplorer.core.Resource
+import com.example.githubexplorer.domain.entity.UserEntity
 import com.example.githubexplorer.domain.usecase.SearchUsersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,5 +53,9 @@ class SearchUserViewModel @Inject constructor(private val searchUsersUseCase: Se
                     }
             }
         }
+    }
+
+    fun onUserClicked(user: UserEntity) {
+        println("hello $user")
     }
 }

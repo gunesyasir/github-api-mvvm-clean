@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.githubexplorer.databinding.FragmentSearchBinding
+import com.example.githubexplorer.domain.entity.UserEntity
 import com.example.githubexplorer.presentation.utils.textChanges
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.debounce
@@ -18,7 +19,7 @@ import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
-class SearchUserFragment : Fragment() {
+class SearchUserFragment : Fragment(), SearchUserAdapter.OnItemClickListener {
     companion object {
         fun newInstance() = SearchUserFragment()
     }
@@ -27,12 +28,22 @@ class SearchUserFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
 
+    private val searchUserAdapter = SearchUserAdapter(this)
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         binding.apply {
+            recyclerView.adapter = searchUserAdapter
+
             searchView
                 .editText
                 .textChanges()
@@ -43,11 +54,6 @@ class SearchUserFragment : Fragment() {
                 }
                 .launchIn(lifecycleScope)
         }
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
         lifecycleScope.launch {
             viewModel.userSearchState.collect { state ->
@@ -62,7 +68,7 @@ class SearchUserFragment : Fragment() {
                 }
 
                 if (state.data != null) {
-                    // show data
+                    searchUserAdapter.submitList(state.data.users)
                 }
             }
         }
@@ -71,5 +77,9 @@ class SearchUserFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onItemClick(user: UserEntity) {
+        viewModel.onUserClicked(user)
     }
 }
