@@ -12,8 +12,10 @@ import com.example.githubexplorer.domain.entity.UserEntity
 import com.example.githubexplorer.presentation.utils.textChanges
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
@@ -48,9 +50,11 @@ class SearchUserFragment : Fragment(), SearchUserAdapter.OnItemClickListener {
                 .editText
                 .textChanges()
                 .drop(1)
+                .map { text -> text?.toString()?.trim().orEmpty() }
+                .distinctUntilChanged()
                 .debounce(500)
                 .onEach { text ->
-                    viewModel.onSearchTextChanged(text?.toString().orEmpty())
+                    viewModel.onSearchTextChanged(text)
                 }
                 .launchIn(lifecycleScope)
         }
