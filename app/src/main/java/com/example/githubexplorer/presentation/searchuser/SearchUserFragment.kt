@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.githubexplorer.databinding.FragmentSearchBinding
 import com.example.githubexplorer.domain.entity.UserEntity
 import com.example.githubexplorer.presentation.utils.textChanges
@@ -42,45 +44,48 @@ class SearchUserFragment : Fragment(), SearchUserAdapter.OnItemClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.recyclerView.adapter = searchUserAdapter
 
-        binding.apply {
-            recyclerView.adapter = searchUserAdapter
-
-            searchView
-                .editText
-                .textChanges()
-                .drop(1)
-                .map { text -> text?.toString()?.trim().orEmpty() }
-                .distinctUntilChanged()
-                .debounce(500)
-                .onEach { text ->
-                    viewModel.onSearchTextChanged(text)
-                }
-                .launchIn(lifecycleScope)
-        }
-
-        lifecycleScope.launch {
-            viewModel.userSearchState.collect { state ->
-                if (state.isLoading) {
-                    // show loading
-                } else {
-                    // hide loading
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    binding.searchView
+                        .editText
+                        .textChanges()
+                        .drop(1)
+                        .map { text -> text?.toString()?.trim().orEmpty() }
+                        .distinctUntilChanged()
+                        .debounce(500)
+                        .collect { text ->
+                            viewModel.onSearchTextChanged(text)
+                        }
                 }
 
-                if (state.error != null) {
-                    // show error
-                }
+                launch {
+                    viewModel.userSearchState.collect { state ->
+                        if (state.isLoading) {
+                            // show loading
+                        } else {
+                            // hide loading
+                        }
 
-                if (state.data != null) {
-                    searchUserAdapter.submitList(state.data.users)
+                        if (state.error != null) {
+                            // show error
+                        }
+
+                        if (state.data != null) {
+                            searchUserAdapter.submitList(state.data.users)
+                        }
+                    }
                 }
             }
         }
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
+        binding.recyclerView.adapter = null
         _binding = null
+        super.onDestroyView()
     }
 
     override fun onItemClick(user: UserEntity) {
