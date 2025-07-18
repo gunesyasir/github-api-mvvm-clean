@@ -9,6 +9,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,7 +27,27 @@ class SearchUserViewModel @Inject constructor(private val searchUsersUseCase: Se
     val userSearchState: StateFlow<UserSearchState>
         get() = _userSearchState.asStateFlow()
 
-    fun onSearchTextChanged(query: String) {
+    private val searchQuery = MutableStateFlow("")
+
+    init {
+        observeSearchQuery()
+    }
+
+    private fun observeSearchQuery() {
+        searchQuery
+            .drop(1)
+            .map { it.trim() }
+            .distinctUntilChanged()
+            .debounce(500)
+            .onEach { onSearchTextChanged(it) }
+            .launchIn(viewModelScope)
+    }
+
+    fun onQueryChanged(query: String) {
+        searchQuery.value = query
+    }
+
+    private fun onSearchTextChanged(query: String) {
         if (query.isNotBlank()) {
             viewModelScope.launch {
                 searchUsersUseCase.execute(query)
@@ -52,6 +78,8 @@ class SearchUserViewModel @Inject constructor(private val searchUsersUseCase: Se
                         }
                     }
             }
+        } else {
+            _userSearchState.value = UserSearchState()
         }
     }
 
