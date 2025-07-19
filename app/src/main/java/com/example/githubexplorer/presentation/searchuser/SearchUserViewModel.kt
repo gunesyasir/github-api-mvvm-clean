@@ -6,6 +6,7 @@ import com.example.githubexplorer.core.Resource
 import com.example.githubexplorer.domain.entity.UserEntity
 import com.example.githubexplorer.domain.usecase.SearchUsersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,8 +27,9 @@ class SearchUserViewModel @Inject constructor(private val searchUsersUseCase: Se
     private val _userSearchState = MutableStateFlow(UserSearchState())
     val userSearchState: StateFlow<UserSearchState>
         get() = _userSearchState.asStateFlow()
-
     private val searchQuery = MutableStateFlow("")
+
+    private var searchJob: Job? = null
 
     init {
         observeSearchQuery()
@@ -49,7 +51,10 @@ class SearchUserViewModel @Inject constructor(private val searchUsersUseCase: Se
 
     private fun onSearchTextChanged(query: String) {
         if (query.isNotBlank()) {
-            viewModelScope.launch {
+            // Cancelling previous request if exist
+            searchJob?.cancel()
+
+            searchJob = viewModelScope.launch {
                 searchUsersUseCase.execute(query)
                     .onStart {}
                     .collect {
