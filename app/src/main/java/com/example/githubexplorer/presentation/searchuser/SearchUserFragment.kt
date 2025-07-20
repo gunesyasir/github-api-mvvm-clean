@@ -1,8 +1,6 @@
 package com.example.githubexplorer.presentation.searchuser
 
-import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -22,15 +20,14 @@ class SearchUserFragment : BaseFragment<FragmentSearchBinding>(), SearchUserAdap
         fun newInstance() = SearchUserFragment()
     }
 
-    override val bindLayout: (LayoutInflater, ViewGroup?, Boolean) -> FragmentSearchBinding
-        get() = FragmentSearchBinding::inflate
-
     private val viewModel: SearchUserViewModel by viewModels()
 
     private val searchUserAdapter = SearchUserAdapter(this)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override val bindLayout: (LayoutInflater, ViewGroup?, Boolean) -> FragmentSearchBinding
+        get() = FragmentSearchBinding::inflate
+
+    override fun FragmentSearchBinding.initialize() {
         binding.recyclerView.adapter = searchUserAdapter
 
         viewLifecycleOwner.lifecycleScope.launch {
