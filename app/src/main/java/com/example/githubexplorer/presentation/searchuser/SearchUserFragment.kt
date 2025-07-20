@@ -4,37 +4,30 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.githubexplorer.databinding.FragmentSearchBinding
 import com.example.githubexplorer.domain.entity.UserEntity
+import com.example.githubexplorer.presentation.base.BaseFragment
 import com.example.githubexplorer.presentation.utils.textChanges
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
-class SearchUserFragment : Fragment(), SearchUserAdapter.OnItemClickListener {
+class SearchUserFragment : BaseFragment<FragmentSearchBinding>(), SearchUserAdapter.OnItemClickListener {
     companion object {
         fun newInstance() = SearchUserFragment()
     }
 
+    override val bindLayout: (LayoutInflater, ViewGroup?, Boolean) -> FragmentSearchBinding
+        get() = FragmentSearchBinding::inflate
+
     private val viewModel: SearchUserViewModel by viewModels()
-    private var _binding: FragmentSearchBinding? = null
-    private val binding get() = _binding!!
 
     private val searchUserAdapter = SearchUserAdapter(this)
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentSearchBinding.inflate(inflater, container, false)
-        return binding.root
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -74,7 +67,6 @@ class SearchUserFragment : Fragment(), SearchUserAdapter.OnItemClickListener {
 
     override fun onDestroyView() {
         binding.recyclerView.adapter = null
-        _binding = null
         super.onDestroyView()
     }
 
