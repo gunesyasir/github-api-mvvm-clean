@@ -4,8 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil3.request.crossfade
 import com.example.githubexplorer.databinding.ItemUserBinding
 import com.example.githubexplorer.domain.entity.UserEntity
+import com.example.githubexplorer.presentation.utils.loadCircularImage
 
 class SearchUserAdapter(
     private val listener: OnItemClickListener
@@ -43,6 +45,9 @@ class SearchUserAdapter(
         fun bind(item: UserEntity) {
             binding.apply {
                 login.text = item.login
+                image.loadCircularImage(item.icon) {
+                    crossfade(true)
+                }
             }
         }
 

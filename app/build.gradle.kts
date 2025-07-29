@@ -73,6 +73,10 @@ dependencies {
     implementation(libs.retrofit.gsonconverter)
     implementation(libs.okhttp.logginginterceptor)
 
+    // Image loader
+    implementation(libs.coil)
+    implementation(libs.coil.network)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
