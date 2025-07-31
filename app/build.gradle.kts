@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kapt)
 }
@@ -50,6 +51,7 @@ android {
 dependencies {
 
     implementation(libs.androidx.core.ktx)
+    implementation(libs.kotlinx.serialization)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
@@ -70,7 +72,7 @@ dependencies {
 
     // Retrofit dependencies
     implementation(libs.retrofit)
-    implementation(libs.retrofit.gsonconverter)
+    implementation(libs.retrofit.kotlinxconverter)
     implementation(libs.okhttp.logginginterceptor)
 
     // Image loader
